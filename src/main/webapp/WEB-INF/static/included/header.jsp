@@ -15,6 +15,9 @@
             <li class="nav-item">
                 <a class="nav-link" href="<c:url value="/user/album"/>">Albums</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<c:url value="/user/anh"/>">Ảnh</a>
+            </li>
         </ul>
         <div>
             <c:if test="${user == null}">

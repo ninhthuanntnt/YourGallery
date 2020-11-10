@@ -5,15 +5,20 @@ public class Image {
     private String name;
     private String path;
     private String pathThumbnail;
+    private int userId;
+    private int albumId;
 
     public Image() {
+        albumId = 0;
     }
 
-    public Image(int id, String name, String path, String pathThumbnail) {
+    public Image(int id, String name, String path, String pathThumbnail, int userId, int albumId) {
         this.id = id;
         this.name = name;
         this.path = path;
         this.pathThumbnail = pathThumbnail;
+        this.userId = userId;
+        this.albumId = albumId;
     }
 
     public int getId() {
@@ -46,5 +51,21 @@ public class Image {
 
     public void setPathThumbnail(String pathThumbnail) {
         this.pathThumbnail = pathThumbnail;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public int getAlbumId() {
+        return albumId;
+    }
+
+    public void setAlbumId(int albumId) {
+        this.albumId = albumId;
     }
 }

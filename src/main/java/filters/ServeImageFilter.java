@@ -1,18 +1,21 @@
 package filters;
 
 import constanst.WebResource;
+import models.bean.Image;
 import models.bean.User;
+import models.dao.ImageDao;
+import models.dao.UserDao;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
-@WebFilter(filterName = "AuthenticationFilter", urlPatterns = "/user/*")
-public class AuthenticationFilter implements Filter {
+@WebFilter(filterName = "ServeImageFilter", urlPatterns = "/public/images/*")
+public class ServeImageFilter implements Filter {
+    private ImageDao imageDao = ImageDao.getInstance();
     public void destroy() {
     }
 
@@ -20,11 +23,15 @@ public class AuthenticationFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-        if(user == null){
-            WebResource.redirect(request, (HttpServletResponse) resp, "/401");
-        }else{
+
+        Image image = imageDao.getImageByPathOrPathThumbnailAndUserId(request.getServletPath().substring(1) + request.getPathInfo(), user.getId());
+
+        if(image != null){
             chain.doFilter(req, resp);
+        }else{
+            WebResource.redirect(request, (HttpServletResponse) resp, "/");
         }
+
     }
 
     public void init(FilterConfig config) throws ServletException {

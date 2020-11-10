@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class WebResource {
+    public static String PATH_TO_RAW_IMAGES = "public/images/raw";
     public static String PATH_TO_PAGES = "/WEB-INF/pages";
 
     public static void forward(HttpServletRequest request, HttpServletResponse response, String path) throws ServletException, IOException {

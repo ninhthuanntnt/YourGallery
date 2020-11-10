@@ -2,15 +2,17 @@
 <html>
 <head>
     <title>Không có quyền</title>
-    <jsp:include page="../static/css/cssBootstrap.jsp"/>
+    <jsp:include page="../../static/css/cssBootstrap.jsp"/>
 </head>
 <body>
 
-<jsp:include page="../static/included/header.jsp"/>
+<jsp:include page="../../static/included/header.jsp"/>
 
-<h1>Bạn không có quyền try cập trang này</h1>
+<div class="container">
+    <h1 class="text-center">Bạn không có quyền try cập trang này</h1>
+</div>
 
-<jsp:include page="../static/js/jsBootstrap.jsp"/>
+<jsp:include page="../../static/js/jsBootstrap.jsp"/>
 </body>
 </html>
 
