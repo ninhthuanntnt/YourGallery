@@ -16,4 +16,12 @@ public class WebResource {
     public static void redirect(HttpServletRequest request, HttpServletResponse response, String url) throws ServletException, IOException {
         response.sendRedirect(request.getContextPath() + url);
     }
+    public static void redirectPreviousPage(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+        String referer = (String) request.getHeader("referer");
+        String host = request.getHeader("host");
+        referer = referer.replace("http://","");
+        referer = referer.replace("https://","");
+        referer = referer.replace(host,"");
+        response.sendRedirect(referer);
+    }
 }

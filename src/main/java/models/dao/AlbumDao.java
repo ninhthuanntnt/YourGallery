@@ -5,7 +5,9 @@ import models.dao.util.DBUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.StringJoiner;
 
 public class AlbumDao {
     private Connection connection;
@@ -39,6 +41,22 @@ public class AlbumDao {
             throwables.printStackTrace();
         }
         return null;
+    }
+    public boolean deleteAlbumsByAlbumIdsAndUserId(int[] albumIds, int userId) {
+        try {
+            StringJoiner joiner = new StringJoiner(",");
+            Arrays.stream(albumIds).forEach(id -> joiner.add("" + id));
+
+            String sql = String.format("DELETE FROM `album` WHERE %s IN (%s) AND %s = ?", ID_COL,joiner.toString(), USER_ID_COL);
+
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, userId);
+
+            return statement.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public boolean addAlbum(Album album) {

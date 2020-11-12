@@ -6,7 +6,9 @@ import models.dao.util.DBUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.StringJoiner;
 
 public class ImageDao {
     private Connection connection;
@@ -19,6 +21,7 @@ public class ImageDao {
 
     private static ImageDao imageDao;
 
+
     public static ImageDao getInstance() {
         if (imageDao == null) {
             imageDao = new ImageDao();
@@ -26,7 +29,7 @@ public class ImageDao {
         return imageDao;
     }
 
-    public ImageDao() {
+    private ImageDao() {
         connection = DBUtil.getConnection();
     }
 
@@ -45,9 +48,115 @@ public class ImageDao {
         return null;
     }
 
+    public List<Image> getImagesByImageIdsAndUserId(int[] imageIds, int userId) {
+        try {
+            StringJoiner joiner = new StringJoiner(",");
+            Arrays.stream(imageIds).forEach(id -> joiner.add("" + id));
+
+            String sql = String.format("SELECT * FROM `image` WHERE %s IN (%s) AND %s = ?", ID_COL, joiner.toString(), USER_ID_COL);
+
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, userId);
+
+            ResultSet resultSet = statement.executeQuery();
+            return parseResultSetToAlbum(resultSet);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public List<Image> getImagesByAlbumIdsAndUserId(int[] albumIds, int userId) {
+        try {
+            StringJoiner joiner = new StringJoiner(",");
+            Arrays.stream(albumIds).forEach(id -> joiner.add("" + id));
+
+            String sql = String.format("SELECT * FROM `image` WHERE %s IN (%s) AND %s = ?", ALBUM_ID_COL, joiner.toString(), USER_ID_COL);
+
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, userId);
+
+            ResultSet resultSet = statement.executeQuery();
+            return parseResultSetToAlbum(resultSet);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public boolean deleteImagesByImageIdsAndUserId(int[] imageIds, int userId) {
+        try {
+            StringJoiner joiner = new StringJoiner(",");
+            Arrays.stream(imageIds).forEach(id -> joiner.add("" + id));
+
+            String sql = String.format("DELETE FROM `image` WHERE %s IN (%s) AND %s = ?", ID_COL, joiner.toString(), USER_ID_COL);
+
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, userId);
+
+            return statement.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateAlbumIdForImagesByUserId(Integer[] imageIds, Integer albumId, int userId) {
+        try {
+            StringJoiner joiner = new StringJoiner(",");
+            Arrays.stream(imageIds).forEach(id -> joiner.add("" + id));
+
+            String sql = String.format("UPDATE `image` SET %s = ? WHERE %s IN (%s) AND %s = ?", ALBUM_ID_COL, ID_COL, joiner.toString(), USER_ID_COL);
+            PreparedStatement statement = connection.prepareStatement(sql);
+
+            if(albumId != null){
+                statement.setInt(1, albumId);
+            }else{
+                statement.setNull(1, Types.INTEGER);
+            }
+            statement.setInt(2, userId);
+
+            return statement.execute();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return false;
+    }
+
+    public List<Image> getImageByAlbumIdAndUserId(Integer albumId, Integer userId) {
+        String sql = String.format("SELECT * FROM `image` WHERE %s = ? AND %s = ?", ALBUM_ID_COL, USER_ID_COL);
+        if (albumId == null)
+            sql = String.format("SELECT * FROM `image` WHERE %s IS NULL AND %s = ?", ALBUM_ID_COL, USER_ID_COL);
+        if (userId == null)
+            sql = String.format("SELECT * FROM `image` WHERE %s = ? AND %s IS NULL", ALBUM_ID_COL, USER_ID_COL);
+
+        try {
+            PreparedStatement statement = null;
+            statement = connection.prepareStatement(sql);
+            if (albumId == null) {
+                statement.setInt(1, userId);
+            } else if (userId == null) {
+                statement.setInt(1, albumId);
+            } else {
+                statement.setInt(1, albumId);
+                statement.setInt(2, userId);
+            }
+
+
+            ResultSet resultSet = statement.executeQuery();
+
+            return parseResultSetToAlbum(resultSet);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
+    }
+
     public Image getImageByPathOrPathThumbnailAndUserId(String path, int userId) {
         String sql = String.format("SELECT * FROM `image` WHERE %s = ? AND ( %s = ? OR %s = ? )"
-                                        , USER_ID_COL, PATH_COL, PATH_THUMBNAIL_COL);
+                , USER_ID_COL, PATH_COL, PATH_THUMBNAIL_COL);
         PreparedStatement statement = null;
         try {
             statement = connection.prepareStatement(sql);
