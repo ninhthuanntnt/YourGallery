@@ -42,6 +42,43 @@ public class AlbumDao {
         }
         return null;
     }
+
+    public Album getAlbumByAlbumIdAndUserId(int albumId, int userId) {
+        String sql = String.format("SELECT * FROM `album` WHERE %s = ? AND %s = ?", ID_COL, USER_ID_COL);
+        PreparedStatement statement = null;
+        try {
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, albumId);
+            statement.setInt(2, userId);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            return parseResultSetToAlbum(resultSet).get(0);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public boolean updateNameByAlbumIdAndUserId(String name, int albumId, int userId) {
+        String sql = String.format("UPDATE `album` SET %s = ? WHERE %s = ? AND %s = ?", NAME_COL, ID_COL, USER_ID_COL);
+        PreparedStatement statement = null;
+        try {
+            statement = connection.prepareStatement(sql);
+            statement.setString(1, name);
+            statement.setInt(2, albumId);
+            statement.setInt(3, userId);
+
+            return statement.execute();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        return false;
+    }
+
+
     public boolean deleteAlbumsByAlbumIdsAndUserId(int[] albumIds, int userId) {
         try {
             StringJoiner joiner = new StringJoiner(",");

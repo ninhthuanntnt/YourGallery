@@ -12,12 +12,14 @@
             <li class="nav-item active">
                 <a class="nav-link" href="<c:url value="/"/>">Trang chủ <span class="sr-only">(current)</span></a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="<c:url value="/user/album"/>">Albums</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="<c:url value="/user/anh"/>">Ảnh</a>
-            </li>
+            <c:if test="${sessionScope.user != null}">
+                <li class="nav-item">
+                    <a class="nav-link" href="<c:url value="/user/album"/>">Albums</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="<c:url value="/user/anh"/>">Ảnh</a>
+                </li>
+            </c:if>
         </ul>
         <div>
             <c:if test="${user == null}">

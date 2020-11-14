@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 public class DBUtil {
-    private static String dbURL = "jdbc:mysql://localhost:3306/your_gallery_db";
+    private static String dbURL = "jdbc:mysql://localhost:3306/your_gallery_db?characterEncoding=UTF-8";
     private static String dbUsername = "root";
     private static String dbPassword = "Thuanthuc123";
     public static Connection getConnection(){

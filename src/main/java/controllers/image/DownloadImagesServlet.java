@@ -1,5 +1,6 @@
 package controllers.image;
 
+import constanst.WebResource;
 import models.bean.Image;
 import models.bean.User;
 import models.dao.ImageDao;
@@ -13,8 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 @WebServlet(name = "DownloadImagesServlet", urlPatterns = "/tai-ve")
 public class DownloadImagesServlet extends HttpServlet {
@@ -25,76 +24,67 @@ public class DownloadImagesServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        User user = (User) request.getSession().getAttribute("user");
+        try{
+            User user = (User) request.getSession().getAttribute("user");
 
-        String[] imgStrIds = request.getParameterValues("imgIds");
-        String albumStrId = request.getParameter("albumId");
-        List<Image> images = new ArrayList<>();
+            String[] imgStrIds = request.getParameterValues("imgIds");
+            String[] albumStrIds = request.getParameterValues("albumIds");
+            List<Image> images = new ArrayList<>();
 
-        // Fetch all images get from imgIds and albumId to list images
-        if (imgStrIds != null && imgStrIds.length > 0) {
-            int[] imgIds = new int[imgStrIds.length];
-            for (int i = 0; i < imgIds.length; i++) {
-                imgIds[i] = Integer.parseInt(imgStrIds[i]);
-            }
-            images.addAll(imageDao.getImagesByImageIdsAndUserId(imgIds, user.getId()));
-        }
-
-        if (albumStrId != null) {
-            int albumId = Integer.parseInt(albumStrId);
-            images.addAll(imageDao.getImageByAlbumIdAndUserId(albumId, user.getId()));
-        }
-
-        // Handle compress image;
-        List<File> files = ImageUtil.getFilesFromImages(images);
-        File zipFile = ImageUtil.compressFile(files, "D:\\4th year\\LTM\\CuoiKi\\Data\\Data1.zip");
-
-        if(zipFile != null){
-            response.setContentType("application/zip, application/octet-stream, application/x-zip-compressed, multipart/x-zip");
-            response.setHeader("Content-disposition", "attachment; filename=images.zip");
-
-            byte[] buff = new byte[1024];
-            try(
-                    FileInputStream in = new FileInputStream(zipFile);
-                    OutputStream out = response.getOutputStream()
-                    ){
-                int len;
-                while((len = in.read(buff)) > 0){
-                    out.write(buff, 0, buff.length);
+            // Fetch all images get from imgIds and albumId to list images
+            if (imgStrIds != null && imgStrIds.length > 0) {
+                int[] imgIds = new int[imgStrIds.length];
+                for (int i = 0; i < imgIds.length; i++) {
+                    imgIds[i] = Integer.parseInt(imgStrIds[i]);
                 }
-            }catch (IOException e){
-                e.printStackTrace();
+                images.addAll(imageDao.getImagesByImageIdsAndUserId(imgIds, user.getId()));
             }
+
+            if (albumStrIds != null && albumStrIds.length > 0) {
+                int[] albumIds = new int[albumStrIds.length];
+                for (int i = 0; i < albumIds.length; i++) {
+                    albumIds[i] = Integer.parseInt(albumStrIds[i]);
+                }
+                images.addAll(imageDao.getImagesByAlbumIdsAndUserId(albumIds, user.getId()));
+            }
+
+            if (images.size() == 1) {
+                response.setContentType("image/jpeg, image/png, image/svg+xml, image/gif");
+                response.setHeader("Content-disposition", "attachment; filename=" + images.get(0).getName());
+
+                List<File> files = ImageUtil.getFilesFromImages(images);
+                File imageFile = files.get(0);
+
+                writeFileOut(imageFile, response);
+
+            } else if (images.size() >= 1) {
+                // Handle compress image;
+                List<File> files = ImageUtil.getFilesFromImages(images);
+                File zipFile = ImageUtil.compressFile(files, "D:\\4th year\\LTM\\CuoiKi\\Data\\Data1.zip");
+
+                if (zipFile != null) {
+                    response.setContentType("application/zip, application/octet-stream, application/x-zip-compressed, multipart/x-zip");
+                    response.setHeader("Content-disposition", "attachment; filename=images.zip");
+
+                    writeFileOut(zipFile, response);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
+        WebResource.redirectPreviousPage(request, response);
     }
 
-    public static File zip(List<File> files, String filename) {
-        File zipfile = new File(filename);
-        // Create a buffer for reading the files
-        byte[] buf = new byte[1024];
-        try {
-            // create the ZIP file
-            ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipfile));
-            // compress the files
-            for (int i = 0; i < files.size(); i++) {
-                FileInputStream in = new FileInputStream(files.get(i));
-                // add ZIP entry to output stream
-                out.putNextEntry(new ZipEntry(files.get(i).getName()));
-                // transfer bytes from the file to the ZIP file
-                int len;
-                while ((len = in.read(buf)) > 0) {
-                    out.write(buf, 0, len);
-                }
-                // complete the entry
-                out.closeEntry();
-                in.close();
+    private static void writeFileOut(File file, HttpServletResponse response) throws IOException {
+        byte[] buff = new byte[1024];
+        try (
+                FileInputStream in = new FileInputStream(file);
+                OutputStream out = response.getOutputStream()
+        ) {
+            int len;
+            while ((len = in.read(buff)) > 0) {
+                out.write(buff, 0, buff.length);
             }
-            // complete the ZIP file
-            out.close();
-            return zipfile;
-        } catch (IOException ex) {
-            System.err.println(ex.getMessage());
         }
-        return null;
     }
 }

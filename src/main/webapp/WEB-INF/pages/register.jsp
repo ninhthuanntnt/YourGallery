@@ -9,7 +9,10 @@
 <jsp:include page="../static/included/header.jsp"/>
 
 
-<div class="container">
+<div class="container p-5">
+    <div class="row justify-content-center mb-5">
+        <h3>Đăng ký tài khoản</h3>
+    </div>
     <div class="row justify-content-center">
         <div class="col-sm-6">
             <form action="${pageContext.request.contextPath}/dang-ky" method="post">

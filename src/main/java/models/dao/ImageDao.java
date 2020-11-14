@@ -48,6 +48,23 @@ public class ImageDao {
         return null;
     }
 
+    public Image getImageByImageIdAndUserId(int imageId ,int userId) {
+        String sql = String.format("SELECT * FROM `image` WHERE %s = ? AND %s = ?", ID_COL, USER_ID_COL);
+        PreparedStatement statement = null;
+        try {
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, imageId);
+            statement.setInt(2, userId);
+            ResultSet resultSet = statement.executeQuery();
+
+            return parseResultSetToAlbum(resultSet).get(0);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
+    }
+
+
     public List<Image> getImagesByImageIdsAndUserId(int[] imageIds, int userId) {
         try {
             StringJoiner joiner = new StringJoiner(",");
@@ -103,6 +120,22 @@ public class ImageDao {
         return false;
     }
 
+    public boolean updateNameForImagesByUserId(String name, int imageId, int userId){
+        try {
+            String sql = String.format("UPDATE `image` SET %s = ? WHERE %s = ? AND %s = ?", NAME_COL, ID_COL, USER_ID_COL);
+            PreparedStatement statement = connection.prepareStatement(sql);
+
+            statement.setString(1, name);
+            statement.setInt(2, imageId);
+            statement.setInt(3, userId);
+
+            return statement.execute();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return false;
+    }
+
     public boolean updateAlbumIdForImagesByUserId(Integer[] imageIds, Integer albumId, int userId) {
         try {
             StringJoiner joiner = new StringJoiner(",");
@@ -125,7 +158,7 @@ public class ImageDao {
         return false;
     }
 
-    public List<Image> getImageByAlbumIdAndUserId(Integer albumId, Integer userId) {
+    public List<Image> getImagesByAlbumIdAndUserId(Integer albumId, Integer userId) {
         String sql = String.format("SELECT * FROM `image` WHERE %s = ? AND %s = ?", ALBUM_ID_COL, USER_ID_COL);
         if (albumId == null)
             sql = String.format("SELECT * FROM `image` WHERE %s IS NULL AND %s = ?", ALBUM_ID_COL, USER_ID_COL);
@@ -178,7 +211,7 @@ public class ImageDao {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, image.getName());
             statement.setString(2, image.getPath());
-            statement.setString(3, image.getPath());
+            statement.setString(3, image.getPathThumbnail());
             statement.setInt(4, image.getUserId());
             if (image.getAlbumId() <= 0) {
                 statement.setNull(5, Types.INTEGER);

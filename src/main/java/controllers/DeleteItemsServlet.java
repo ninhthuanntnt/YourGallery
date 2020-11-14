@@ -48,7 +48,10 @@ public class DeleteItemsServlet extends HttpServlet {
 
             imageBo.deleteImagesByImageIdsAndUserId(imgIds, user.getId());
         }
-
-        WebResource.redirectPreviousPage(request, response);
+        if(WebResource.getPreviousPage(request, response).contains("chi-tiet")){
+            WebResource.redirect(request, response, (String) request.getSession().getAttribute("previousPage"));
+        }else{
+            WebResource.redirectPreviousPage(request, response);
+        }
     }
 }

@@ -2,6 +2,8 @@ package utils;
 
 import models.bean.Image;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +35,10 @@ public class ImageUtil {
         return files;
     }
 
+    public static File getFileFromImage(Image image){
+        return new File(pathToSavedImages + File.separator + image.getPath().replace("public/",""));
+    }
+
     public static File compressFile(List<File> files, String pathZipFile) {
 
         try {
@@ -60,4 +66,5 @@ public class ImageUtil {
         }
         return null;
     }
+
 }

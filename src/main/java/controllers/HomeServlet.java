@@ -30,7 +30,7 @@ public class HomeServlet extends HttpServlet {
         User user = (User) request.getSession().getAttribute("user");
         if (user != null) {
             List<Album> albums = albumDao.getAllAlbumByUserId(user.getId());
-            List<Image> images = imageDao.getImageByAlbumIdAndUserId(null, user.getId());
+            List<Image> images = imageDao.getImagesByAlbumIdAndUserId(null, user.getId());
 
             request.setAttribute("albums", albums);
             request.setAttribute("images", images);

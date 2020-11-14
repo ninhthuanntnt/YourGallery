@@ -4,8 +4,11 @@
 <head>
     <title>Album page</title>
     <jsp:include page="../static/css/cssBootstrap.jsp"/>
+    <link rel="stylesheet" href="<c:url value="/static/css/general.css"/>">
+    <link rel="stylesheet" href="https://unpkg.com/vanilla-context@1.0.11/dist/vanilla-context.min.css">
 </head>
 <body>
+<div id="contextmenu-container" style="position: fixed; display: none;"></div>
 <jsp:include page="../static/included/header.jsp"/>
 
 <div class="container-fluid p-5">
@@ -16,6 +19,9 @@
         </button>
         <button class="btn btn-danger mr-2" id="btn-delete-items">
             Xóa album đã chọn
+        </button>
+        <button class="btn btn-primary mr-2" id="btn-download-items">
+            Tải xuống
         </button>
         <!-- Modal -->
         <div class="modal fade " id="formModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
@@ -46,24 +52,13 @@
         </div>
     </div>
     <div class="row">
-        <c:forEach var="album" items="${albums}">
-            <div class="btn-group p-2 col-sm-2 align-items-stretch">
-                <button class="btn btn-success" style="flex: 0 0 auto">
-                    <input type="checkbox"
-                           name="album-checkbox"
-                           value="${album.id}"/>
-                </button>
-                <button class="btn btn-outline-success"
-                        onclick="window.location = '<c:url value="/user/anh?albumId=${album.id}&albumName=${album.name}"/>'">
-                        ${album.name}
-                </button>
-            </div>
-        </c:forEach>
+        <jsp:include page="../static/included/lstAlbums.jsp"/>
     </div>
 </div>
 
 <script src="<c:url value="/static/js/home.js"/>"></script>
 <jsp:include page="../static/js/deleteItem.jsp"/>
+<jsp:include page="../static/js/downloadItem.jsp"/>
 <jsp:include page="../static/js/jsBootstrap.jsp"/>
 </body>
 </html>

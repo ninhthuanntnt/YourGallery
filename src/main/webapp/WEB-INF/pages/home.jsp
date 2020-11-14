@@ -5,12 +5,14 @@
 <head>
     <title>Home page</title>
     <jsp:include page="../static/css/cssBootstrap.jsp"/>
+    <link rel="stylesheet" href="<c:url value="/static/css/general.css"/>">
+    <link rel="stylesheet" href="https://unpkg.com/vanilla-context@1.0.11/dist/vanilla-context.min.css">
 </head>
 <body>
-
+<div id="contextmenu-container" style="position: fixed; display: none;"></div>
 <jsp:include page="../static/included/header.jsp"/>
 
-<div class="container-fluid mt-3">
+<div class="container-fluid p-5">
     <c:if test="${sessionScope.user != null}">
         <div class="row p-2">
             <button class="btn btn-success mr-2" id="btn-add-image-to-album">
@@ -27,55 +29,19 @@
             <h4>Albums</h4>
         </div>
         <div class="row">
-            <c:forEach var="album" items="${albums}">
-                <div class="btn-group p-2 col-sm-2 align-items-stretch">
-                    <button class="btn btn-success btn-wrapper-checkbox" style="flex: 0 0 auto">
-                        <input type="checkbox"
-                               name="album-checkbox"
-                               value="${album.id}"/>
-                    </button>
-                    <button class="btn btn-outline-success"
-                            onclick="window.location = '<c:url value="/user/anh?albumId=${album.id}&albumName=${album.name}"/>'">
-                            ${album.name}
-                    </button>
-                </div>
-            </c:forEach>
+            <jsp:include page="../static/included/lstAlbums.jsp"/>
         </div>
         <div class="row p-2">
             <h4>Ảnh</h4>
         </div>
         <div class="row">
-            <c:forEach var="image" items="${images}">
-                <div class="p-2 col-sm-2">
-                    <div class="card">
-                        <div class="card-img-top" style="height: 8em; overflow: hidden">
-                            <img src="<c:url value="/${image.pathThumbnail}"/>"
-                                 class="position-relative"
-                                 alt="${image.name}"
-                                 style="width: 100%">
-                        </div>
-                        <div class="card-body d-flex align-items-center">
-                            <input type="checkbox"
-                                   name="img-checkbox"
-                                   value="${image.id}"
-                                   aria-label="Checkbox for following text input"
-                                   class="mr-3">
-                            <p class="card-text">
-                                    ${(image.name.length() > 15)?image.name.substring(0,15):image.name}
-                                <c:if test="${image.name.length() > 15}">
-                                    ...
-                                </c:if>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </c:forEach>
+            <jsp:include page="../static/included/lstImages.jsp"/>
         </div>
     </c:if>
     <c:if test="${sessionScope.user == null}">
         <div class="row flex-column">
             <h3 class="text-center">Chào mừng bạn đến với kho lưu trữ ảnh số 1 VN</h3>
-            <h4 class="text-center">Vui lòng đăng nhập để sử dụng</h4>
+            <h4 class="text-center">Vui lòng <a href="<c:url value="/dang-nhap"/>">đăng nhập</a> để sử dụng</h4>
         </div>
     </c:if>
 </div>
@@ -122,5 +88,6 @@
 </script>
 <jsp:include page="../static/js/downloadItem.jsp"/>
 <jsp:include page="../static/js/jsBootstrap.jsp"/>
+<scritpt src="<c:url value="/static/js/ctxmenu-native.1.0.0.js"/>"></scritpt>
 </body>
 </html>

@@ -4,12 +4,16 @@
 <head>
     <title>Ảnh</title>
     <jsp:include page="../static/css/cssBootstrap.jsp"/>
+    <link rel="stylesheet" href="<c:url value="/static/css/general.css"/>">
+    <link rel="stylesheet" href="https://unpkg.com/vanilla-context@1.0.11/dist/vanilla-context.min.css">
 </head>
 <body>
+<div id="contextmenu-container" style="position: fixed; display: none;"></div>
 <jsp:include page="../static/included/header.jsp"/>
 
 <div class="container-fluid p-5">
 
+    <div id="contextmenu-container" style="position: fixed; display: none;"></div>
     <div class="row justify-content-center mb-3">
         <!-- Button trigger modal -->
         <button type="button" class="btn btn-success mr-2" data-toggle="modal" data-target="#formModal">
@@ -26,6 +30,9 @@
                 Xóa ảnh khỏi album
             </button>
         </c:if>
+        <button class="btn btn-primary mr-2" id="btn-download-items">
+            Tải xuống
+        </button>
         <!-- Modal -->
         <div class="modal fade " id="formModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
              aria-labelledby="formModalLabel" aria-hidden="true">
@@ -88,54 +95,31 @@
             </nav>
         </div>
     </c:if>
-    <div class="row">
-        <c:forEach var="image" items="${images}">
-            <div class="p-2 col-sm-2">
-                <div class="card">
-                    <div class="card-img-top" style="height: 8em; overflow: hidden">
-                        <a href="<c:url value="/${image.pathThumbnail}"/>" target="_blank">
-                            <img src="<c:url value="/${image.pathThumbnail}"/>"
-                                 class="position-relative"
-                                 alt="${image.name}"
-                                 style="width: 100%">
-                        </a>
-                    </div>
-                    <div class="card-body d-flex align-items-center">
-                        <input type="checkbox"
-                               name="img-checkbox"
-                               value="${image.id}"
-                               aria-label="Checkbox for following text input"
-                               class="mr-3">
-                        <p class="card-text">
-                                ${(image.name.length() > 15)?image.name.substring(0,15):image.name}
-                            <c:if test="${image.name.length() > 15}">
-                                ...
-                            </c:if>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </c:forEach>
+    <div class="row" id="parent-context-menu">
+        <jsp:include page="../static/included/lstImages.jsp"/>
     </div>
 </div>
 <script src="<c:url value="/static/js/home.js"/>"></script>
 <jsp:include page="../static/js/deleteItem.jsp"/>
 <script>
     let btnRemoveFromAlbum = document.getElementById("btn-remove-from-album");
-    btnRemoveFromAlbum.onclick = ()=>{
-        if(imgIds.length != 0){
-            let urlImgIds = "";
-            for (let id of imgIds) {
-                urlImgIds += "&imgIds=" + id;
+    if(btnRemoveFromAlbum){
+        btnRemoveFromAlbum.onclick = ()=>{
+            if(imgIds.length != 0){
+                let urlImgIds = "";
+                for (let id of imgIds) {
+                    urlImgIds += "&imgIds=" + id;
+                }
+                urlImgIds = urlImgIds.substring(0, urlImgIds.length);
+                window.location = "<c:url value="/xoa-anh-khoi-album?"/>" + urlImgIds;
+            }else{
+                alert("Vui lòng chọn ảnh");
             }
-            urlImgIds = urlImgIds.substring(0, urlImgIds.length);
-            window.location = "<c:url value="/xoa-anh-khoi-album?"/>" + urlImgIds;
-        }else{
-            alert("Vui lòng chọn ảnh");
         }
     }
 </script>
 <jsp:include page="../static/js/jsBootstrap.jsp"/>
+<jsp:include page="../static/js/downloadItem.jsp"/>
 <script>
     $('input[type="file"]').on('change', function (e) {
         let fileName = e.target.files[0].name;
